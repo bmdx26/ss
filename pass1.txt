@@ -1,0 +1,178 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+void main()
+{
+	char opcode[10],mnemonic[3],operand[10],label[10],code[10];
+	int locctr,start,length,c;
+	FILE *fin,*fop,*fp1,*fsym,*fp2;
+	fin=fopen("input.txt","r");
+	fop=fopen("optab.txt","r");
+	fsym=fopen("symtab.txt","w");
+	fp1=fopen("inter.txt","w");
+	fp2=fopen("length.txt","w");
+	fscanf(fin,"%s%s%s",label,opcode,operand);
+	if(strcmp(opcode,"START")==0)
+	{
+		start=atoi(operand);
+		locctr=start;
+		fprintf(fp1,"\t%s\t%s\t%s\n",label,opcode,operand);
+		fscanf(fin,"%s%s%s",label,opcode,operand);
+	}
+	else
+	{
+		locctr=0;
+	}
+	while(strcmp(opcode,"END")!=0)
+	{
+		fprintf(fp1,"%d\t%s\t%s\t%s\n",locctr,label,opcode,operand);
+		if(strcmp(label,"**")!=0)
+		{
+			fprintf(fsym,"%s\t%d\n",label,locctr);
+		}
+		rewind(fop);
+		c=0;
+		while(!feof(fop))
+		{
+			fscanf(fop,"%s%s",code,mnemonic);
+			if(strcmp(opcode,code)==0)
+			{
+				locctr+=3;
+				c++;
+				break;
+			}
+		}
+		if(strcmp(opcode,"WORD")==0)
+		{
+		locctr+=3;
+		}
+		else if(strcmp(opcode,"RESW")==0)
+		locctr+=3*(atoi(operand));
+		else if(strcmp(opcode,"RESB")==0)
+		locctr+=atoi(operand);
+		else if(strcmp(opcode,"BYTE")==0)
+		{
+			if(operand[0]=='C')
+				locctr+=(strlen(operand)-3);
+			else
+				locctr+=1;
+		}
+		else if(c==0)
+		{
+			fprintf(fp1,"ERROR:Invalid operation code;\n");
+			exit(0);
+		}
+		fscanf(fin,"%s%s%s",label,opcode,operand);
+		}
+		fprintf(fp1,"%d\t%s\t%s\t%s\n",locctr,label,opcode,operand);
+		length=locctr-start;
+		fprintf(fp1,"length is %d",length);
+		fprintf(fp2,"%d",length);
+		fclose(fin);
+		fclose(fop);
+		fclose(fp1);
+		fclose(fp2);
+		fclose(fsym);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INPUT
+
+COPY START 1000
+** LDA FIVE
+** STA NUM1
+** LDCH NUM2
+** STCH C1
+NUM1 RESW 2
+FIVE WORD 5
+NUM2 BYTE X'F1'
+C1 RESB 1
+** END **
+
+INTERMEDIATE
+
+	COPY	START	1000
+1000	**	LDA	FIVE
+1003	**	STA	NUM1
+1006	**	LDCH	NUM2
+1009	**	STCH	C1
+1012	NUM1	RESW	2
+1018	FIVE	WORD	5
+1021	NUM2	BYTE	X'F1'
+1022	C1	RESB	1
+1023	**	END	**
+length is 23
+
+OPTAB
+
+LDA 00
+STA OC
+LDCH 50
+STCH 54
+
+SYMTAB
+NUM1	1012
+FIVE	1018
+NUM2	1021
+C1	1022
+
+LENGTH
+23
+
+
+
+INPUT
+
+COPY START 1000
+** LDA FIVE
+** STA NUM1
+** LDCH NUM2
+** STCH C1
+NUM1 RESW 2
+FIVE WORD 5
+NUM2 BYTE X'F1'
+FIVE WORD 5
+C1 RESB 1
+** END **
+
+INTERMEDIATE
+	COPY	START	1000
+1000	**	LDA	FIVE
+1003	**	STA	NUM1
+1006	**	LDCH	NUM2
+1009	**	STCH	C1
+1012	NUM1	RESW	2
+1018	FIVE	WORD	5
+1021	NUM2	BYTE	X'F1'
+1022	FIVE	WORD	5
+1025	C1	RESB	1
+1026	**	END	**
+length is 26
+
+OPTAB
+LDA 00
+STA 02
+LDCH 50
+STCH 54
+
+SYMTAB
+NUM1	1012
+FIVE	1018
+NUM2	1021
+FIVE	1022
+C1	1025
+
+LENGTH
+26

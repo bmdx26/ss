@@ -1,0 +1,75 @@
+.model small
+.stack 100h
+.data
+    num1 db ?
+    num2 db ?
+    sum db ?
+    product db ?
+    msg1 db "Enter first number: $"
+    msg2 db "Enter second number: $"
+    msg3 db "Sum is: $"
+    msg4 db "Product is: $"
+    resultSum db 0
+    resultProd db 0
+
+.code
+main:
+    ; Set up data segment
+    mov ax, @data
+    mov ds, ax
+
+    ; Prompt and read first number
+    mov dx, offset msg1
+    mov ah, 09h
+    int 21h
+
+    mov ah, 01h   ; Function to read a character
+    int 21h
+    sub al, '0'   ; Convert ASCII to integer
+    mov num1, al  ; Store first number
+
+    ; Prompt and read second number
+    mov dx, offset msg2
+    mov ah, 09h
+    int 21h
+
+    mov ah, 01h   ; Function to read a character
+    int 21h
+    sub al, '0'   ; Convert ASCII to integer
+    mov num2, al  ; Store second number
+
+    ; Calculate sum
+    mov al, num1
+    add al, num2
+    mov sum, al
+
+    ; Calculate product
+    mov al, num1
+    mov bl, num2
+    mul bl          ; Multiply num1 by num2
+    mov product, al ; Store the result
+
+    ; Display sum
+    mov dx, offset msg3
+    mov ah, 09h
+    int 21h
+    mov al, sum
+    add al, '0'     ; Convert back to ASCII
+    mov dl, al
+    mov ah, 02h     ; Function to display character
+    int 21h
+
+    ; Display product
+    mov dx, offset msg4
+    mov ah, 09h
+    int 21h
+    mov al, product
+    add al, '0'     ; Convert back to ASCII
+    mov dl, al
+    mov ah, 02h     ; Function to display character
+    int 21h
+
+    ; Exit program
+    mov ah, 4ch
+    int 21h
+end main

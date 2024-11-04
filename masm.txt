@@ -1,0 +1,283 @@
+.model small
+.stack 100
+.data
+        string dw ?
+        msg db 13,10,"enter the string:$"
+        msg1 db 0ah,0dh, "Given string is pallindrome$"
+        msg2 db 0ah,0dh, "Given string is not pallindrome$"
+        read macro msg
+         MOV dx,offset msg
+         MOV ah,3fh
+         Int 21h
+        endm
+        print macro msg
+         MOV dx,offset msg
+         MOV ah,09h
+         Int 21h
+        endm
+.code
+	MOV ax,@data
+	MOV ds,ax
+        print msg
+        read string
+	MOV si,offset string
+	Loop1:MOV ax,[si]
+              cmp al,"$"
+              je label1
+              inc si
+              jmp Loop1
+        label1:MOV di,offset string
+        dec si
+	Loop2:cmp si,di
+                                jl out1
+				MOV ax,[si]
+				MOV bx,[di]
+				cmp al,bl
+                                jne out2
+				dec si
+				inc di
+				jmp Loop2
+        out1:print msg1
+        jmp exit
+        out2:print msg2
+exit:MOV ah,4ch
+     Int 21h
+end		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.model small
+.stack 64
+dispm macro msg
+mov dx,offset msg
+mov ah,09h
+int 21h
+endm
+
+dispn macro al
+mov dl,al
+mov ah,02h
+int 21h
+endm
+
+readno macro num
+mov ah,01h
+int 21h
+sub al,30h
+mov num,al
+endm
+
+.data
+	msg1 db 0ah,"Calculator 1.Sum 2.Product 3.Subtraction 4.Quotient 5.Exit$"
+	msg2 db 0ah,"Enter the choice:$"
+	msg3 db 0ah,"Enter the number(1):$"
+	msg4 db 0ah,"Enter the number(2):$"
+	msg5 db 0ah,"The sum is:$"
+	msg6 db 0ah,"The product is:$"
+	msg7 db 0ah,"The difference is:$"
+	msg8 db 0ah,"The quotient is:$"
+	num1 db ?
+	num2 db ?
+	ch1 db ?
+
+.code
+	start:mov ax,@data
+	mov ds,ax
+	dispm msg1
+	dispm msg2
+	readno ch1
+	cmp ch1,05
+	jz exit
+dispm msg3
+readno num1
+
+dispm msg4
+readno num2
+
+cmp ch1,01
+jz addn
+cmp ch1,02
+jz pron
+cmp ch1,03
+jz subn
+cmp ch1,04
+jz divn
+
+exit:mov ah,4ch
+	int 21h
+
+addn:dispm msg5
+	mov al,num1
+	add al,num2
+	add al,30h
+	dispn al
+	jmp start
+
+pron:dispm msg6
+	mov al,num1
+	mul num2
+	add al,30h
+	dispn al
+	jmp start
+	
+subn:dispm msg7
+	mov al,num1
+	sub al,num2
+	add al,30h
+	dispn al
+	jmp start
+	
+divn:dispm msg8
+	mov ah,00h
+	mov al,num1
+	div num2
+	add al,30h
+	dispn al
+	jmp start
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.model small
+.stack 64
+
+.data
+	msg db "Hello World$"
+.code
+mov ax,@data
+	mov ds,ax
+	
+	mov dx,offset msg
+	mov ah,09h
+	int 21h
+	
+	mov ah,4ch
+	int 21h
+end
+
+
+
+
+
+
+
+
+
+
+
+
+assume cs:code, ds:data
+data segment
+	msg1 db "Enter a number:$"
+	msg2 db 0Ah ,"Enter another number:$"
+	msg3 db 0Ah , "Sum is $"
+	num1 db ?
+	num2 db ?
+	
+	
+data ends
+	
+	code segment
+	start:
+	mov ax,data
+	mov ds,ax
+	mov dx,offset msg1
+	mov ah,09h
+	int 21h
+	
+	mov ah,01h
+	int 21h
+	mov num1,al
+	
+	mov dx,offset msg2
+	mov ah,09h
+	int 21h
+	
+	mov ah,01h
+	int 21h
+	mov num2,al
+	
+	mov al,num1
+	add al,num2
+	sub al,30h
+	
+	mov dx,offset msg3
+	mov ah,09h
+	int 21h
+	
+	mov dl,al
+	mov ah,02h
+	int 21h
+	
+	mov ah,4ch
+	int 21h
+	
+	code ends
+	end start
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
